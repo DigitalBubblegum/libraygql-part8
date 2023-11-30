@@ -101,6 +101,7 @@ let books = [
 const typeDefs = `
   type Authors{
     name: String!
+    born: Int
     bookCount: Int!
   }
   type Books{
@@ -122,6 +123,10 @@ const typeDefs = `
       published: Int!
       genres: [String!]!
     ):Books
+    editAuthor(
+      name: String!
+      setBornTo: Int!
+    ):Authors
   }
 `
 
@@ -143,6 +148,18 @@ const resolvers = {
         books = books.concat(book)
         return book
       }
+    },
+    editAuthor: (root,args) => {
+      const author = authors.find(author => author.name === args.name)
+      console.log(args)
+      console.log('edit mutation',authors)
+      if(!author){
+        return null
+      }
+      const updatedAuthor = {...author,born:args.setBornTo}
+      console.log('updated',updatedAuthor)
+      authors = authors.map(author => author.name === args.name ? updatedAuthor : author)
+      return updatedAuthor
     }
   },
   Query: {
@@ -155,6 +172,7 @@ const resolvers = {
     allAuthors: () => {
       return authors.map(author => ({
         name: author.name,
+        born: author.born,
         bookCount: books.filter(book => book.author === author.name).length
       }))
     }
