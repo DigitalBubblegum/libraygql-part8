@@ -154,11 +154,11 @@ const resolvers = {
     editAuthor: (root,args) => {
       const author = authors.find(author => author.name === args.name)
       console.log(args)
-      console.log('edit mutation',authors)
+      console.log('edit mutation')
       if(!author){
         return null
       }
-      const updatedAuthor = {...author,born:args.setBornTo}
+      const updatedAuthor = {...author,born:args.setBornTo,bookCount: books.filter(book => book.author === author.name).length,}
       console.log('updated',updatedAuthor)
       authors = authors.map(author => author.name === args.name ? updatedAuthor : author)
       return updatedAuthor
