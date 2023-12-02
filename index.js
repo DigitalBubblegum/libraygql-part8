@@ -135,7 +135,7 @@ const typeDefs = `
 const resolvers = {
   Mutation:{
     addBook:(root,args) => {
-      const book = {...args}
+      const book = { ...args, id: uuid() };
       if (authors.includes(book.author)) {
         books = books.concat(book)
         return book
