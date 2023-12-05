@@ -169,7 +169,19 @@ const resolvers = {
     },
     addAuthor: async(root,args) => {
       const author = new Author({...args})
-      return author.save()
+      // return author.save()
+      try{
+        await author.save()
+      }catch (error) {
+        console.log('error')
+        throw new GraphQLError('Saving author failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.name,
+            error
+          }
+        })
+      }
     },
     editAuthor: (root,args) => {
       const author = authors.find(author => author.name === args.name)
