@@ -155,6 +155,14 @@ const resolvers = {
   Mutation:{
     addBook: async (root,args) => {
       const checkAuthorExistsinDB = await Author.exists({ name:args.author })
+      console.log(checkAuthorExistsinDB)
+      if(!checkAuthorExistsinDB){
+        const author = new Author({ name: args.author,born:null })
+        const savedAuthor = await author.save()
+        const book = new Book({ ...args, author: savedAuthor._id})
+        const savedBook = await book.save()
+        return savedBook.populate('author')
+      }
       const book = new Book({ ...args, author: checkAuthorExistsinDB})
       const savedBook = await book.save()
       return savedBook.populate('author')
@@ -179,15 +187,29 @@ const resolvers = {
   Query: {
     bookCount: async() => Book.collection.countDocuments(),
     authorCount: async() => Author.collection.countDocuments(),
-    allBooks: (root,args) => {
+    allBooks: async(root,args) => {
       console.log('allbooks',args)
       if(!args.author && !args.genre){
         console.log('nully')
-        return books
+        const book = await Book.find({}).populate('author')
+        return book
+      }
+      else if(!args.genre){
+        console.log('else if only author',args.author)
+        const book = await Book.find().populate('author')
+        // console.log(book)
+        return book.filter(b=>b.author.name === args.author)
+        // return books.filter((book) => book.author === args.author || book.genres.includes(args.genre))
+      }
+      else if(!args.author){
+        console.log('else if only genre')
+        const book = await Book.find({}).populate('author')
+        // console.log(book.filter(b=>b.genres.includes(args.genre)))
+        return book.filter(b=>b.genres.includes(args.genre))
       }
       else{
-        console.log('else')
-        return books.filter((book) => book.author === args.author || book.genres.includes(args.genre))
+        const book = await Book.find({}).populate('author')
+        return book.filter(b=>(b.author.name === args.author && b.author.name === args.author))
       }
       //8.4
       
