@@ -144,6 +144,7 @@ const typeDefs = `
     allAuthors: [Authors!]!
     me: User
     genreList: [String!]!
+    reccoBooks: [Books]
   }
   type Mutation {
     addAuthor(
@@ -280,6 +281,12 @@ const resolvers = {
     },
   },
   Query: {
+    reccoBooks: async(root, args,{currentUser})=>{
+      const books = await Book.find().populate('author')
+      const bookReccomendations = books.filter(book=>book.genres.includes(currentUser.favoriteGenre))
+      // console.log('in query reccobooks favorite genre is ',bookReccomendations)
+      return bookReccomendations
+    },
     genreList: async(root, args) => {
       const books = await Book.find().populate('author')
       const genres = []
