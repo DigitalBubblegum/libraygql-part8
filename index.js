@@ -143,6 +143,7 @@ const typeDefs = `
     allBooks(author:String, genre:String): [Books]
     allAuthors: [Authors!]!
     me: User
+    genreList: [String!]!
   }
   type Mutation {
     addAuthor(
@@ -279,6 +280,20 @@ const resolvers = {
     },
   },
   Query: {
+    genreList: async(root, args) => {
+      const books = await Book.find().populate('author')
+      const genres = []
+      books.map((book) => {
+        book.genres.forEach((element) => {
+          if (genres.includes(element)) {
+            null;
+          } else {
+            genres.push(element);
+          }
+        });
+      });
+      return genres
+    },
     me: (root, args, context) => {return context.currentUser},
     bookCount: async() => Book.collection.countDocuments(),
     authorCount: async() => Author.collection.countDocuments(),
