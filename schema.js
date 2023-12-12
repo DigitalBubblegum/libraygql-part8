@@ -54,7 +54,7 @@ const typeDefs = `
   ): Token
   }
   type Subscription {
-    bookAdded: Books!
+    bookAdded: Books
   }
 `
 module.exports = typeDefs

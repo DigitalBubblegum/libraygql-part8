@@ -23,14 +23,18 @@ const resolvers = {
         const author = new Author({ name: args.author,born:null })
         const savedAuthor = await author.save()
         const book = new Book({ ...args, author: savedAuthor._id})
-        const savedBook = await book.save()
-        pubsub.publish('BOOK_ADDED',{bookAdded : book})
-        return savedBook.populate('author')
+        let savedBook = await book.save()
+        savedBook = savedBook.populate('author')
+        console.log('book',savedBook)
+        pubsub.publish('BOOK_ADDED',{bookAdded : savedBook})
+        return savedBook
       }
       const book = new Book({ ...args, author: checkAuthorExistsinDB})
-      const savedBook = await book.save()
-      pubsub.publish('BOOK_ADDED',{bookAdded : book})
-      return savedBook.populate('author')
+      let savedBook = await book.save()
+      savedBook = savedBook.populate('author')
+      console.log('book',savedBook)
+      pubsub.publish('BOOK_ADDED',{bookAdded : savedBook})
+      return savedBook
      }catch(error){
       console.log('error')
       throw new GraphQLError('creating the book failed',{
