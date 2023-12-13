@@ -4,6 +4,7 @@ const Author = require('./models/author')
 const User = require('./models/user')
 const { GraphQLError } = require('graphql')
 const { PubSub } = require('graphql-subscriptions')
+const author = require('./models/author')
 const pubsub = new PubSub()
 
 const resolvers = {
@@ -176,8 +177,15 @@ const resolvers = {
       //8.4
       
     },
-    allAuthors: async() => {
-      return Author.find({})
+    allAuthors: async(root,args) => {
+      const books = await Book.find({}).populate('author')
+      const authors = await Author.find({})
+      return authors.map(author => ({
+        name: author.name,
+        born: author.born,
+        bookCount: books.filter(book=>book.author.name === author.name).length,
+        id: author.id
+      }))
     }
   },
 }
